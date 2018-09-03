@@ -144,3 +144,4 @@ gatk AddOrReplaceReadGroups -I father.bam -O father.bam \
                     RGPU=${rgid}\
                     RGPL=illumina \
                     RGSM=${sampleId}
+
