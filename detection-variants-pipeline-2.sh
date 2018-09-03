@@ -112,7 +112,7 @@ samtools stats daughter.bam > daughter.bam.stats
 # Command: plot-bamstats
 # Input: statistics text file (output of samtools-stats)
 # Ouput: plots (.png)
-plot-bamstats -p ./ daughter.bam.stats
+plot-bamstats -p ./plots-daughter/ daughter.bam.stats
 
 # Index the alignment
 # Command: samtools index
