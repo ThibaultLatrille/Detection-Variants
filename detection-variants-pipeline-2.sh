@@ -103,6 +103,7 @@ samtools view -@ 4 HG02024_SRR822251.sam -Sbh -f 3 > HG02024_SRR822251.bam
 # Ouput: sorted and compressed alignment (.bam)
 samtools sort -@ 4 HG02024_SRR822251.bam > HG02024_SRR822251.sorted.bam
 
+# (Required as a pre-processing for GATK. Not otherwise)
 # Add Read group (cf https://gatkforums.broadinstitute.org/gatk/discussion/6472/read-groups)
 # Command: gatk AddOrReplaceReadGroups
 # Input: alignment (.bam) and read group (Read group identifier, DNA preparation library identifier, Platform, Platform Unit, Sample)
