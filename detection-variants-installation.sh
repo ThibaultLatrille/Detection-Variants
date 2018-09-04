@@ -139,6 +139,6 @@ cd picard/
 
 # Export name of the directory
 echo 'export PICARDDIR=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libs' >> ~/.profile
-
+echo 'export PICARDTOOL=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libspicard.jar' >> ~/.profile
 
 
