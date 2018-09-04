@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-installationDirectory=/home/thibault/Shared/Detection-Variants/tools
+installationDirectory=~/Shared/Detection-Variants/tools
 
 ########################################################################################################################
 # JAVA
