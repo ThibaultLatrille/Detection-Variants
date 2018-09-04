@@ -124,3 +124,21 @@ cd gatk-4.0.8.1
 chmod 755 gatk
 echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
 source ~/.profile
+
+
+########################################################################################################################
+# Picard Suite
+#	Version: 2.0
+########################################################################################################################
+
+# Download and install
+cd ${installationDirectory} 
+git clone https://github.com/broadinstitute/picard.git
+cd picard/
+./gradlew shadowJar
+
+# Export name of the directory
+echo 'export PICARDDIR=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libs' >> ~/.profile
+
+
+
