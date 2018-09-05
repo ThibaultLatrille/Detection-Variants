@@ -1,5 +1,7 @@
-#!/usr/bin/env bash
-installationDirectory=/home/thibault/Shared/Detection-Variants/tools
+#!/bin/bash
+installationDirectory=~/TP-mardi/Tools
+mkdir -p ${installationDirectory}
+
 
 ########################################################################################################################
 # JAVA
@@ -29,8 +31,7 @@ unzip fastqc_v0.11.7.zip
 # Export the path of the executable (such that fastqc can be lunched from anywhere)
 cd FastQC
 chmod 755 fastqc
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
-source ~/.profile
+echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 
 ########################################################################################################################
@@ -52,8 +53,7 @@ cd bwa
 make
 
 # Export the path of the executable (such that bwa can be lunched from anywhere)
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
-source ~/.profile
+echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 
 ########################################################################################################################
@@ -79,8 +79,7 @@ make
 make install
 
 # Export the path of the executable (such that samtools can be lunched from anywhere)
-echo 'export PATH=${PATH}:'$(pwd)'/bin' >> ~/.profile
-source ~/.profile
+echo 'export PATH=${PATH}:'$(pwd)'/bin' >> ~/.bashrc
 
 
 ########################################################################################################################
@@ -102,13 +101,12 @@ unzip IGV_2.4.14.zip
 # Export the path of the executable (such that igv.sh can be lunched from anywhere)
 cd IGV_2.4.14
 chmod 755 igv.sh
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
-source ~/.profile
+echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 
 ########################################################################################################################
 # Genome Analysis ToolKit (GATK)
-#   Version: 4.0.8.1
+#   Version: 3.3
 #   Licence: BSD 3-Clause (https://github.com/broadinstitute/gatk/blob/master/LICENSE.TXT)
 #   Author: Broad Institute, Inc (https://github.com/broadinstitute/gatk/blob/master/AUTHORS.TXT)
 #   URL: https://software.broadinstitute.org/gatk/
@@ -118,14 +116,31 @@ source ~/.profile
 #   DOI: https://dx.doi.org/10.1101%2Fgr.107524.110
 ########################################################################################################################
 
+
 # Download and extract
 cd ${installationDirectory}
-wget https://github.com/broadinstitute/gatk/releases/download/4.0.8.1/gatk-4.0.8.1.zip
-unzip gatk-4.0.8.1.zip
+wget https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.3-0-g37228af -O gatk-3.3.tar.bz2
+tar -xjf gatk-3.3.tar.bz2
 
-# Export the path of the executable (such that gatk can be lunched from anywhere)
-cd gatk-4.0.8.1
-chmod 755 gatk
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
+# # Export the path of the executable (such that gatk can be launched from anywhere)
+cd gatk3.3
+echo 'export GATK='${installationDirectory}'/GenomeAnalysisTK.jar' >> ~/.bashrc
 
-source ~/.profile
+
+########################################################################################################################
+# Picard Suite
+#	Version: 2.0
+#	URL: https://broadinstitute.github.io/picard/
+#	Repository: https://github.com/broadinstitute/picard.git
+########################################################################################################################
+
+# Download and install
+cd ${installationDirectory} 
+git clone https://github.com/broadinstitute/picard.git
+cd picard/
+./gradlew shadowJar
+
+# Export name of the directory
+echo 'export PICARD='$(pwd)'/build/libs/picard.jar' >> ~/.bashrc
+
+source ~/.bashrc

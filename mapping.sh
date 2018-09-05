@@ -1,6 +1,6 @@
 #!/bin/bash
-cd ~/Shared/Detection-Variants/data
-source ~/.profile
+mkdir -p ~/TP-mardi/plots
+cd ~/TP-mardi
 
 ########################################################################################################################
 # Requirements:
@@ -9,14 +9,15 @@ source ~/.profile
 #	BWA-MEM (version 0.7.17-r1194-dirty)
 #	SAMtools (version 1.9)
 #	IGV (version 2.4.14)
-#	GATK (version 4.0.8.1)
+#	GATK (version 3.3)
 ########################################################################################################################
 
 java -version
 fastqc -version
 bwa
 samtools
-gatk --list
+java -jar ${GATK} --help
+java -jar ${PICARD}
 
 ##########################################################
 ## Download, extract and index the reference chromosome ##
@@ -87,6 +88,7 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG02024/sequence_read/
 # Ouput: alignment (.sam)
 bwa mem -t 4 -M Homo_sapiens.Chr20.fa SRR822251_1.filt.fastq.gz SRR822251_2.filt.fastq.gz > HG02024_SRR822251.sam
 
+# (Optional)
 # Compute summary statistics of the alignment
 # Command: samtools flagstats
 # Input: alignment (.sam)
@@ -110,27 +112,24 @@ samtools sort -@ 4 HG02024_SRR822251.bam > HG02024_SRR822251.sorted.bam
 # Command: gatk AddOrReplaceReadGroups
 # Input: alignment (.bam) and read group (Read group identifier, DNA preparation library identifier, Platform, Platform Unit, Sample)
 # Ouput: annotated alignment (.bam)
-gatk AddOrReplaceReadGroups -I HG02024_SRR822251.sorted.bam -O daughter.bam \
-                            --RGID SRR822251 --RGLB Pond-206419 --RGPL illumina \
-                            --RGPU C1E0PACXX121221.6.tagged_373 --RGSM HG02024 --RGPI 160
+java -jar ${PICARD} AddOrReplaceReadGroups I=HG02024_SRR822251.sorted.bam \
+                                         O=daughter.bam \
+                                         RGID=SRR822251 RGLB=Pond-206419 RGPL=illumina \
+                                         RGPU=C1E0PACXX121221.6.tagged_373 RGSM=HG02024 RGPI=160
 
-# Visualize read group
-# Command: samtools view -H && grep
-# Input: annotated alignment (.bam)
-# Ouput: read group
-samtools view -H daughter.bam | grep '@RG'
-
+# (Optional)
 # Compute statistics of the alignment
 # Command: samtools-stats
 # Input: alignment (.bam)
 # Ouput: text file (human and computer readable)
 samtools stats daughter.bam > daughter.bam.stats
 
+# (Optional)
 # Plot statistics of the alignment
 # Command: plot-bamstats
 # Input: statistics text file (output of samtools-stats)
 # Ouput: plots (.png)
-plot-bamstats -p ./ daughter.bam.stats
+plot-bamstats -p ~/TP-mardi/plots/ daughter.bam.stats
 
 # Index the alignment
 # Command: samtools index
@@ -169,9 +168,9 @@ bwa mem -t 4 -M Homo_sapiens.Chr20.fa ${RUN_ID}_1.filt.fastq.gz ${RUN_ID}_2.filt
 # Command: gatk AddOrReplaceReadGroups
 # Input: alignment (.bam) and read group
 # Ouput: alignment (.bam)
-gatk AddOrReplaceReadGroups -I ${SAMPLE_NAME}.${RUN_ID}.sorted.bam -O mother.bam \
-                            --RGID ${RUN_ID} --RGLB ${LIBRARY_NAME} --RGPL ${INSTRUMENT_PLATFORM} \
-                            --RGPU ${RUN_NAME} --RGSM ${SAMPLE_NAME} --RGPI ${INSERT_SIZE}
+java -jar ${PICARD} AddOrReplaceReadGroups I=${RUN_ID}.sorted.bam O=mother.bam \
+                                         RGID=${RUN_ID} RGLB=${LIBRARY_NAME} RGPL=${INSTRUMENT_PLATFORM} \
+                                         RGPU=${RUN_NAME} RGSM=${SAMPLE_NAME} RGPI=${INSERT_SIZE}
 
 # Index the alignment
 # Command: samtools index
@@ -230,9 +229,10 @@ do
     # Command: gatk AddOrReplaceReadGroups
     # Input: alignment (.bam) and read group
     # Ouput: alignment (.bam)
-    gatk AddOrReplaceReadGroups -I ${SAMPLE_NAME}.${RUN_ID}.sorted.bam -O ${SAMPLE_NAME}.${RUN_ID}.sorted.RG.bam \
-                                --RGID ${RUN_ID} --RGLB ${LIBRARY_NAME} --RGPL ${INSTRUMENT_PLATFORM} \
-                                --RGPU ${RUN_NAME} --RGSM ${SAMPLE_NAME} --RGPI ${INSERT_SIZE}
+    java -jar ${PICARD} AddOrReplaceReadGroups I=${SAMPLE_NAME}.${RUN_ID}.sorted.bam \
+                                             O=${SAMPLE_NAME}.${RUN_ID}.sorted.RG.bam \
+                                             RGID=${RUN_ID} RGLB=${LIBRARY_NAME} RGPL=${INSTRUMENT_PLATFORM} \
+                                             RGPU=${RUN_NAME} RGSM=${SAMPLE_NAME} RGPI=${INSERT_SIZE}
 
     samtools view -H ${SAMPLE_NAME}.${RUN_ID}.sorted.RG.bam | grep '@RG'
 
@@ -257,5 +257,3 @@ samtools merge -b ${SAMPLE_NAME}.bamlist father.bam
 # Input: alignment (.sam or .bam)
 # Ouput: indexed alignment (.sam.bai or .bam.bai)
 samtools index father.bam
-
-samtools view -H father.bam | grep '@RG'
