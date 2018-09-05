@@ -105,7 +105,7 @@ source ~/.profile
 
 ########################################################################################################################
 # Genome Analysis ToolKit (GATK)
-#   Version: 4.0.8.1
+#   Version: 3.3
 #   Licence: BSD 3-Clause (https://github.com/broadinstitute/gatk/blob/master/LICENSE.TXT)
 #   Author: Broad Institute, Inc (https://github.com/broadinstitute/gatk/blob/master/AUTHORS.TXT)
 #   URL: https://software.broadinstitute.org/gatk/
@@ -114,16 +114,33 @@ source ~/.profile
 #             generation DNA sequencing data. Genome research (2010).
 ########################################################################################################################
 
+# # Download and extract
+# cd ${installationDirectory}
+# wget https://github.com/broadinstitute/gatk/releases/download/4.0.8.1/gatk-4.0.8.1.zip
+# unzip gatk-4.0.8.1.zip
+#
+# # Export the path of the executable (such that gatk can be lunched from anywhere)
+# cd gatk-4.0.8.1
+# chmod 755 gatk
+# echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
+# source ~/.profile
+#
 # Download and extract
-cd ${installationDirectory}
-wget https://github.com/broadinstitute/gatk/releases/download/4.0.8.1/gatk-4.0.8.1.zip
-unzip gatk-4.0.8.1.zip
-
-# Export the path of the executable (such that gatk can be lunched from anywhere)
-cd gatk-4.0.8.1
-chmod 755 gatk
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
-source ~/.profile
+# cd ${installationDirectory}
+# wget https://github.com/broadgsa/gatk/archive/3.3.zip
+# unzip 3.3.zip
+#
+# # Export the path of the executable (such that gatk can be launched from anywhere)
+# cd gatk-3.3
+# chmod 755 gatk
+# echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
+# source ~/.profile
+#
+# # Download and extract
+# cd ${installationDirectory}
+# wget https://github.com/broadgsa/gatk/archive/3.3.zip
+# unzip 3.3.zip
+#
 
 
 ########################################################################################################################
