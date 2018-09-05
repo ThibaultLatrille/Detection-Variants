@@ -10,8 +10,8 @@ source ~/.profile
 ########################################################################################################################
 
 java -version
-ls $GATK
-ls $PICARDTOOL
+java -jar $GATK/GenomeAnalysisTK.jar --help
+java -jar $PICARDTOOL
 
 
 ###################################################

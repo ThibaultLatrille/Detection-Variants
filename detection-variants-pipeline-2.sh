@@ -9,14 +9,16 @@ source ~/.profile
 #	BWA-MEM (version 0.7.17-r1194-dirty)
 #	SAMtools (version 1.9)
 #	IGV (version 2.4.14)
-#	GATK (version 4.0.8.1)
+#	GATK (version 3.3.8.1)
 ########################################################################################################################
 
 java -version
 fastqc -version
 bwa
 samtools
-gatk --list
+java -jar $GATK/GenomeAnalysisTK.jar --help
+java -jar $PICADTOOL
+
 
 ##########################################################
 ## Download, extract and index the reference chromosome ##
