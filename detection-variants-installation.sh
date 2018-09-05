@@ -18,7 +18,7 @@ sudo apt-get install openjdk-8-jre
 #   Licence: BSD, MIT
 #   Author: Simon Andrews
 #   URL: http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
-#   Citation: Andrews, S. FastQC: a quality control tool for high throughput sequence data. (2010).
+#   Citation: Simon Andrews. FastQC: a quality control tool for high throughput sequence data. (2010).
 ########################################################################################################################
 
 # Download and extract
@@ -39,7 +39,8 @@ source ~/.profile
 #   Licence: GPLv3
 #   Author: Heng Li (lh3@me.com)
 #   Repository: https://github.com/lh3/bwa
-#   Citation: Li H. Aligning sequence reads, clone sequences and assembly contigs with BWA-MEM. arXiv:1303.3997v2 (2013)
+#   Citation: Heng Li. Aligning sequence reads, clone sequences and assembly contigs with BWA-MEM (2013).
+#   DOI: https://arxiv.org/abs/1303.3997v2
 ########################################################################################################################
 
 # Download (clone git repository)
@@ -62,7 +63,8 @@ source ~/.profile
 #   Author: Heng Li
 #   URL: http://www.htslib.org/
 #   Repository: https://github.com/samtools/samtools
-#   Citation: Li H., et al. The Sequence alignment/map (SAM) format and SAMtools. Bioinformatics, 25, 2078-9 (2009).
+#   Citation: Heng Li, et al. The Sequence alignment/map (SAM) format and SAMtools. Bioinformatics, 25, 2078-9 (2009).
+#   DOI:  https://doi.org/10.1093/bioinformatics/btp352
 ########################################################################################################################
 
 # Download and extract
@@ -89,6 +91,7 @@ source ~/.profile
 #   URL: http://software.broadinstitute.org/software/igv/
 #   Repository: https://github.com/igvteam/igv/
 #   Citation: James T. Robinson, et al. Integrative Genomics Viewer. Nature Biotechnology 29, 24–26 (2011).
+#   DOI: https://doi.org/10.1038/nbt.1754
 ########################################################################################################################
 
 # Download and extract
@@ -110,8 +113,9 @@ source ~/.profile
 #   Author: Broad Institute, Inc (https://github.com/broadinstitute/gatk/blob/master/AUTHORS.TXT)
 #   URL: https://software.broadinstitute.org/gatk/
 #   Repository: https://github.com/broadinstitute/gatk
-#   Citation: McKenna, Aaron, et al.  The Genome Analysis Toolkit: a MapReduce framework for analyzing next-
+#   Citation: Aaron McKenna, et al.  The Genome Analysis Toolkit: a MapReduce framework for analyzing next-
 #             generation DNA sequencing data. Genome research (2010).
+#   DOI: https://dx.doi.org/10.1101%2Fgr.107524.110
 ########################################################################################################################
 
 # Download and extract
@@ -123,4 +127,5 @@ unzip gatk-4.0.8.1.zip
 cd gatk-4.0.8.1
 chmod 755 gatk
 echo 'export PATH=${PATH}:'$(pwd) >> ~/.profile
+
 source ~/.profile
