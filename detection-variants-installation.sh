@@ -146,6 +146,8 @@ source ~/.profile
 ########################################################################################################################
 # Picard Suite
 #	Version: 2.0
+#	URL: https://broadinstitute.github.io/picard/
+#	Repository: https://github.com/broadinstitute/picard.git
 ########################################################################################################################
 
 # Download and install
@@ -156,6 +158,6 @@ cd picard/
 
 # Export name of the directory
 echo 'export PICARDDIR=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libs' >> ~/.profile
-echo 'export PICARDTOOL=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libspicard.jar' >> ~/.profile
+echo 'export PICARDTOOL=/pandata/gautier/TP_NGS_THIB/tools/picard/build/libs/picard.jar' >> ~/.profile
 
 
