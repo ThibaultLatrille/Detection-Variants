@@ -81,6 +81,8 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG02024/sequence_read/
 
 # Map the paired sequencing reads against the reference Human chromosome 20
 # Command: bwa mem
+# Options: -M (Mark shorter split hits as secondary for GATK compatibility)
+#          -t [number of CPU] (multi-threading)
 # Input: indexed reference (.fa), and compressed sequencing reads (.fastq.gz)
 # Ouput: alignment (.sam)
 bwa mem -t 4 -M Homo_sapiens.Chr20.fa SRR822251_1.filt.fastq.gz SRR822251_2.filt.fastq.gz > HG02024_SRR822251.sam
@@ -93,6 +95,7 @@ samtools flagstat HG02024_SRR822251.sam > HG02024_SRR822251.sam.flagstats
 
 # Compress the alignment and filter unaligned reads
 # Command: samtools view
+# Options: -@ [number of CPU] (multi-threading)
 # Input: alignment (.sam)
 # Ouput: compressed alignment (.bam)
 samtools view -@ 4 HG02024_SRR822251.sam -Sbh -f 3 > HG02024_SRR822251.bam
@@ -256,103 +259,3 @@ samtools merge -b ${SAMPLE_NAME}.bamlist father.bam
 samtools index father.bam
 
 samtools view -H father.bam | grep '@RG'
-
-#
-######################
-### Variant Calling ##
-######################
-#
-## GATK best practices pipeline:
-## 1. Mark duplicates
-## 2. Realigned around known indels
-## 3. Recalibrate errors using known SNP
-#
-## The Ftp folder for the known indels and snps
-#ftpMapping=ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/other_mapping_resources/
-## Use of the Mills and 1000G gold standard dataset for known indels
-#known_indels=Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz
-## Use of the dbSNP v142 dataset
-#known_snps=ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
-#
-## Downloading the known indels and SNPs if necessary
-#wget ${ftpMapping}/${known_indels} -O ./${known_indels}
-#wget ${ftpMapping}/${known_indels}.tbi -O ./${known_indels}.tbi
-#wget ${ftpMapping}/${known_snps} -O ./${known_snps}
-#wget ${ftpMapping}/${known_snps}.tbi -O ./${known_snps}.tbi
-#
-#gatk MarkDuplicates \
-#    -I father.bam \
-#    -O father.markDup.bam \
-#    --METRICS_FILE father.markDup_metrics.txt
-#
-#samtools index father.markDupRG.bam
-#
-#gatk CreateSequenceDictionary -R Homo_sapiens.Chr20.fa
-#
-## 2. Realigned around known indels
-#gatk  RealignerTargetCreator \
-#    -R Homo_sapiens.Chr20.fa \
-#    -I father.markDupRG.bam \
-#    -o father.intervals \
-#    --known ./${known_indels}
-#
-#gatk IndelRealigner \
-#    -R Homo_sapiens.Chr20.fa \
-#    -I father.markDupRG.bam \
-#    -o father.markDupRG.realigned.bam \
-#    --targetIntervals father.intervals \
-#    -known ${known_indels}
-#
-## 3. Recalibrate errors using known SNP
-#gatk BaseRecalibrator \
-#    -R Homo_sapiens.Chr20.fa \
-#    -I father.markDupRG.realigned.bam \
-#    -o father.markDupRG.realigned.table \
-#    -cov ReadGroupCovariate \
-#    -cov QualityScoreCovariate \
-#    -cov CycleCovariate -cov ContextCovariate \
-#    -knownSites ${known_snps}
-#
-#gatk PrintReads \
-#    -R Homo_sapiens.Chr20.fa \
-#    -I father.markDupRG.realigned.bam \
-#    -o father.markDupRG.realigned.recal.bam \
-#    -BQSR father.markDupRG.realigned.table \
-#    --disable_bam_indexing
-#
-#
-#gatk HaplotypeCaller \
-#    -R Homo_sapiens.Chr20.fa \
-#    -I father.markDupRG.realigned.recal.bam \
-#    -o father.gvcf \
-#    --genotyping_mode DISCOVERY \
-#    -variant_index_type LINEAR \
-#    -variant_index_parameter 128000 \
-#    --emitRefConfidence GVCF
-#
-## Converting gVCF to VCF
-#gatk GenotypeGVCFs \
-#    -R Homo_sapiens.Chr20.fa \
-#    --variant father.gvcf \
-#    --variant mother.gvcf \
-#    --variant daughter.gvcf \
-#    -o trio.vcf
-#
-#
-#gatk PhaseByTransmission \
-#        -R Homo_sapiens.Chr20.fa \
-#        -V trio.vcf \
-#        -ped ./20130606_g1k.ped.txt \
-#        -o trio.phased.vcf
-#
-#gatk VariantEval \
-#        -R Homo_sapiens.Chr20.fa \
-#        -o trio.phased.VE.txt \
-#        --eval:set1 trio.vcf \
-#        --eval:set2 trio.phased.vcf
-#
-#gatk GenotypeConcordance \
-#        -R Homo_sapiens.Chr20.fa \
-#        -eval trio.phased.vcf \
-#        -comp trio.vcf \
-#        -o trio.GC.txt
