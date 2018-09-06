@@ -16,7 +16,7 @@ java -jar ${PICARD}
 ############################
 
 ref_genome=Homo_sapiens.Chr20.fa
-pedigree=./resources/20130606_g1k.ped
+pedigree=~/TP-mardi/resources/20130606_g1k.ped
 
 # Perform joint variant calling
 # Command: gatk GenotypeGVCFs
@@ -74,6 +74,3 @@ java -jar ${GATK} -T GenotypeConcordance \
 		   -eval trio.phased.vcf \
 		   -comp trio.vcf \
 		   -o trio.GC.txt
-
-
-

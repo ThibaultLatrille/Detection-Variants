@@ -2,7 +2,6 @@
 installationDirectory=~/TP-mardi/Tools
 mkdir -p ${installationDirectory}
 
-
 ########################################################################################################################
 # JAVA
 #   Version: 8
@@ -106,7 +105,7 @@ echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 ########################################################################################################################
 # Genome Analysis ToolKit (GATK)
-#   Version: 3.3
+#   Version: 3.8-1-0
 #   Licence: BSD 3-Clause (https://github.com/broadinstitute/gatk/blob/master/LICENSE.TXT)
 #   Author: Broad Institute, Inc (https://github.com/broadinstitute/gatk/blob/master/AUTHORS.TXT)
 #   URL: https://software.broadinstitute.org/gatk/
@@ -119,13 +118,11 @@ echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 # Download and extract
 cd ${installationDirectory}
-wget https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.3-0-g37228af -O gatk-3.3.tar.bz2
-tar -xjf gatk-3.3.tar.bz2
+wget https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.8-1-0-gf15c1c3ef -O gatk-3.8-1.tar.bz2
+tar -xjf gatk-3.8-1.tar.bz2
 
-# # Export the path of the executable (such that gatk can be launched from anywhere)
-cd gatk3.3
-echo 'export GATK='${installationDirectory}'/GenomeAnalysisTK.jar' >> ~/.bashrc
-
+# Export the path of the executable (such that gatk can be launched from anywhere)
+echo 'export GATK='${installationDirectory}'/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar' >> ~/.bashrc
 
 ########################################################################################################################
 # Picard Suite

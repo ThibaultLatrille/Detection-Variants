@@ -30,8 +30,8 @@ java -jar ${PICARD}
 #####################
 
 # Make directory for resources
-mkdir ./resources/
-cd ./resources/
+mkdir ~/TP-mardi/resources/
+cd ~/TP-mardi/resources/
 
 # Download resources
 # Command: wget
@@ -39,8 +39,10 @@ cd ./resources/
 # Ouput: compressed variant calling files (.vcf.gz)
 
 # Known indels
-wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
-wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi
+wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/other_mapping_resources/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz
+wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/other_mapping_resources/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz.tbi
+# wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+# wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi
 
 # Known SNPs
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/other_mapping_resources/ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
@@ -52,10 +54,9 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20130606_sample_
 
 # Choose variable names
 cd ../
-known_indels=./resources/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
-known_SNPs=./resources/ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
+known_indels=~/TP-mardi/resources/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz
+known_SNPs=~/TP-mardi/resources/ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
 ref_genome=Homo_sapiens.Chr20.fa
-file_name=father
 
 
 #######################################
@@ -81,6 +82,12 @@ java -jar ${PICARD} CreateSequenceDictionary \
 ### Prepare GATK input data #
 #############################
 
+# Choose variable names
+known_indels=~/TP-mardi/resources/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz
+known_SNPs=~/TP-mardi/resources/ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
+ref_genome=Homo_sapiens.Chr20.fa
+file_name=father
+
 # Fix mate pair information (prevention in case of errors) + sort (in case not done)
 # Command: FixMateInformation (PICARDtools)
 # Input: alignment (.bam)
@@ -100,11 +107,6 @@ java -jar ${PICARD} MarkDuplicates \
 	I=${file_name}.fixed_mate.bam \
 	O=${file_name}.marked_dups.bam \
 	M=${file_name}.dup_metrics.txt
-
-# Make sure that read group already added. Else, add it now
-# Command: gatk AddOrReplaceReadGroups
-# Input: alignment (.bam) and read group
-# Ouput: alignment (.bam)
 
 # Make sure that index already obtained. Else, do it now
 # Command: samtools index / BuilBamIndex (PICARDtools)
@@ -153,7 +155,6 @@ java -jar ${GATK} -T IndelRealigner \
 java -jar ${GATK} -T BaseRecalibrator \
 	-R ${ref_genome} \
 	-knownSites ${known_SNPs} \
-	-knownSites ${known_indels} \
 	-cov ReadGroupCovariate \
 	-cov QualityScoreCovariate \
 	-cov CycleCovariate \
@@ -169,7 +170,6 @@ java -jar ${GATK} -T BaseRecalibrator \
 java -jar ${GATK} -T BaseRecalibrator \
 	-R ${ref_genome} \
 	-knownSites ${known_SNPs} \
-	-knownSites ${known_indels} \
 	-I ${file_name}.realigned_reads.bam \
 	-BQSR ${file_name}.recal_data.table \
 	-o ${file_name}.post_recal_data.table 
@@ -189,11 +189,12 @@ java -jar ${GATK} -T AnalyzeCovariates \
 # Command: gatk PrintReads + BQSR option
 # Input: realigned alignment (.bam) + reference genome (.fa) + base quality recalbration table (.table / .txt)
 # Output: base quality recalibrated alignement (.bam)
-java -jar ${GATK} -T PrintReads \
+java -jar ${GATK} -T PrintReads -l INFO \
 	-R ${ref_genome} \
 	-I ${file_name}.realigned_reads.bam \
 	-BQSR ${file_name}.recal_data.table \
-	-o ${file_name}.recal_reads.bam
+	-o ${file_name}.recal_reads.bam \
+	--disable_bam_indexing
 
 
 
@@ -204,16 +205,23 @@ java -jar ${GATK} -T PrintReads \
 # Perform variant calling
 # Command: gatk HaplotypeCaller
 # Input: base quality recalibrated alignement (.bam) + reference genome (.fa)
-# Output: Genomic variant calling file (.g.vcf)
+# Output: Genomic variant calling file (.gvcf)
+samtools index ${file_name}.recal_reads.bam
+
 java -jar ${GATK} -T HaplotypeCaller \
+                  -R ${ref_genome} \
+                  -I ${file_name}.recal_reads.bam \
+                  -o ${file_name}.g.vcf  \
+                  --genotyping_mode DISCOVERY \
+                  -variant_index_type LINEAR \
+                  -variant_index_parameter 128000 \
+                  --emitRefConfidence GVCF
+
+# Perform variant calling
+# Command: gatk GenotypeGVCFs
+# Input : genomic variant calling files (.gvcf) + reference genome (.fa)
+# Output: Variant calling file (.vcf)
+java -jar ${GATK} -T GenotypeGVCFs \
 	-R ${ref_genome} \
-	-I ${file_name}.recal_reads.bam \
-	-ERC GVCF \
-	--genotyping_mode DISCOVERY \
-	--variant_index_type LINEAR \
-	-variant_index_parameter 128000 \
-	-o ${file_name}.g.vcf 
-
-
-# Redo the whole procedure (starting from pre-processing of data) for daughter and mother files
-# ...
+	--variant ${file_name}.g.vcf \
+	-o ${file_name}.vcf
