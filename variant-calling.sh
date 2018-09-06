@@ -83,9 +83,6 @@ java -jar ${PICARD} CreateSequenceDictionary \
 #############################
 
 # Choose variable names
-known_indels=~/TP-mardi/resources/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz
-known_SNPs=~/TP-mardi/resources/ALL_20141222.dbSNP142_human_GRCh38.snps.vcf.gz
-ref_genome=Homo_sapiens.Chr20.fa
 file_name=father
 
 # Fix mate pair information (prevention in case of errors) + sort (in case not done)
@@ -189,13 +186,11 @@ java -jar ${GATK} -T AnalyzeCovariates \
 # Command: gatk PrintReads + BQSR option
 # Input: realigned alignment (.bam) + reference genome (.fa) + base quality recalbration table (.table / .txt)
 # Output: base quality recalibrated alignement (.bam)
-java -jar ${GATK} -T PrintReads -l INFO \
+java -jar ${GATK} -T PrintReads \
 	-R ${ref_genome} \
 	-I ${file_name}.realigned_reads.bam \
 	-BQSR ${file_name}.recal_data.table \
-	-o ${file_name}.recal_reads.bam \
-	--disable_bam_indexing
-
+	-o ${file_name}.recal_reads.bam
 
 
 ###################
@@ -205,9 +200,7 @@ java -jar ${GATK} -T PrintReads -l INFO \
 # Perform variant calling
 # Command: gatk HaplotypeCaller
 # Input: base quality recalibrated alignement (.bam) + reference genome (.fa)
-# Output: Genomic variant calling file (.gvcf)
-samtools index ${file_name}.recal_reads.bam
-
+# Output: Genomic variant calling file (.g.vcf)
 java -jar ${GATK} -T HaplotypeCaller \
                   -R ${ref_genome} \
                   -I ${file_name}.recal_reads.bam \
@@ -219,7 +212,7 @@ java -jar ${GATK} -T HaplotypeCaller \
 
 # Perform variant calling
 # Command: gatk GenotypeGVCFs
-# Input : genomic variant calling files (.gvcf) + reference genome (.fa)
+# Input : genomic variant calling files (.g.vcf) + reference genome (.fa)
 # Output: Variant calling file (.vcf)
 java -jar ${GATK} -T GenotypeGVCFs \
 	-R ${ref_genome} \
