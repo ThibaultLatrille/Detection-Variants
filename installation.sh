@@ -1,17 +1,10 @@
 #!/bin/bash
-installationDirectory=~/TP-mardi/Tools
-mkdir -p ${installationDirectory}
 
-########################################################################################################################
-# JAVA
-#   Version: 8
-#   Licence: MIT
-#   Author: Oracle Corporation
-#   URL: https://www.java.com
-########################################################################################################################
-sudo apt-get install openjdk-8-jdk
-sudo apt-get install openjdk-8-jre
+INSTALL_DIR=~/tools
+# If on Biosphere (IFB), use '/mnt/data/tools' instead of '~/tools' as the installation directory
+# INSTALL_DIR=/mnt/data/tools
 
+mkdir -p ${INSTALL_DIR}
 
 ########################################################################################################################
 # FastQC
@@ -23,15 +16,15 @@ sudo apt-get install openjdk-8-jre
 ########################################################################################################################
 
 # Download and extract
-cd ${installationDirectory}
+cd ${INSTALL_DIR}
 wget http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.7.zip
 unzip fastqc_v0.11.7.zip
 
 # Export the path of the executable (such that fastqc can be lunched from anywhere)
 cd FastQC
 chmod 755 fastqc
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
-
+echo 'export PATH='$(pwd)':${PATH}' >> ~/.bashrc
+source ~/.bashrc
 
 ########################################################################################################################
 # BWA-MEM
@@ -43,8 +36,11 @@ echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 #   DOI: https://arxiv.org/abs/1303.3997v2
 ########################################################################################################################
 
+# Install libz necessary for compiling bwa
+sudo apt-get install libz-dev
+
 # Download (clone git repository)
-cd ${installationDirectory}
+cd ${INSTALL_DIR}
 git clone https://github.com/lh3/bwa.git
 
 # Create the executable
@@ -52,8 +48,8 @@ cd bwa
 make
 
 # Export the path of the executable (such that bwa can be lunched from anywhere)
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
-
+echo 'export PATH='$(pwd)':${PATH}' >> ~/.bashrc
+source ~/.bashrc
 
 ########################################################################################################################
 # SAMtools
@@ -67,7 +63,7 @@ echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 ########################################################################################################################
 
 # Download and extract
-cd ${installationDirectory}
+cd ${INSTALL_DIR}
 wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2
 tar xvjf samtools-1.9.tar.bz2
 
@@ -79,7 +75,7 @@ make install
 
 # Export the path of the executable (such that samtools can be lunched from anywhere)
 echo 'export PATH=${PATH}:'$(pwd)'/bin' >> ~/.bashrc
-
+source ~/.bashrc
 
 ########################################################################################################################
 # Integrative Genomics Viewer (IGV)
@@ -93,15 +89,16 @@ echo 'export PATH=${PATH}:'$(pwd)'/bin' >> ~/.bashrc
 ########################################################################################################################
 
 # Download and extract
-cd ${installationDirectory}
+cd ${INSTALL_DIR}
 wget http://data.broadinstitute.org/igv/projects/downloads/2.4/IGV_2.4.14.zip
 unzip IGV_2.4.14.zip
 
 # Export the path of the executable (such that igv.sh can be lunched from anywhere)
 cd IGV_2.4.14
-chmod 755 igv.sh
-echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
-
+mv igv.sh igv
+chmod 755 igv
+echo 'export PATH='$(pwd)':${PATH}' >> ~/.bashrc
+source ~/.bashrc
 
 ########################################################################################################################
 # Genome Analysis ToolKit (GATK)
@@ -117,12 +114,13 @@ echo 'export PATH=${PATH}:'$(pwd) >> ~/.bashrc
 
 
 # Download and extract
-cd ${installationDirectory}
-wget https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.8-1-0-gf15c1c3ef -O gatk-3.8-1.tar.bz2
+cd ${INSTALL_DIR}
+wget https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive\&version=3.8-1-0-gf15c1c3ef -O gatk-3.8-1.tar.bz2
 tar -xjf gatk-3.8-1.tar.bz2
 
 # Export the path of the executable (such that gatk can be launched from anywhere)
-echo 'export GATK='${installationDirectory}'/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar' >> ~/.bashrc
+echo 'export GATK='${INSTALL_DIR}'/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef/GenomeAnalysisTK.jar' >> ~/.bashrc
+source ~/.bashrc
 
 ########################################################################################################################
 # Picard Suite
@@ -131,13 +129,15 @@ echo 'export GATK='${installationDirectory}'/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef
 #	Repository: https://github.com/broadinstitute/picard.git
 ########################################################################################################################
 
+# Install java Jdk necessary to install Picard
+sudo apt-get install openjdk-8-jdk
+
 # Download and install
-cd ${installationDirectory} 
+cd ${INSTALL_DIR} 
 git clone https://github.com/broadinstitute/picard.git
 cd picard/
 ./gradlew shadowJar
 
 # Export name of the directory
 echo 'export PICARD='$(pwd)'/build/libs/picard.jar' >> ~/.bashrc
-
 source ~/.bashrc

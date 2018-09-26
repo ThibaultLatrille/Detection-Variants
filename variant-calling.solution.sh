@@ -72,12 +72,9 @@ java -jar ${PICARD} CreateSequenceDictionary \
 	O=${REF_GENOME/.fa/.dict}
 
 
-#############################
-### Prepare GATK input data #
-#############################
-
 # Choose variable names
-FILE_NAME=HG02024
+for FILE_NAME in "HG02024" "HG02025" "HG02026"
+do
 
 # Mark Duplicate reads
 # Command: MarkDuplicates (PICARDtools)
@@ -109,7 +106,7 @@ java -jar ${GATK} -T RealignerTargetCreator \
 	-R ${REF_GENOME} \
 	-known ${KNOWN_INDELS} \
 	-I ${FILE_NAME}.marked_dups.bam \
-	-o ${FILE_NAME}.target_intervals.list 
+	-o ${FILE_NAME}.target_intervals.list
 
 # Perform local realignement
 # Command: gatk IndelRealigner
@@ -175,4 +172,9 @@ java -jar ${GATK} -T HaplotypeCaller \
 # Command: gatk GenotypeGVCFs
 # Input : genomic variant calling files (.g.vcf) + reference genome (.fa)
 # Output: Variant calling file (.vcf)
-xxxxxxxxxxxxxxxxxxxxx
+java -jar ${GATK} -T GenotypeGVCFs \
+	-R ${REF_GENOME} \
+	--variant ${FILE_NAME}.g.vcf \
+	-o ${FILE_NAME}.vcf
+
+done
